@@ -1,20 +1,97 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import { projectAuth } from "../configs/firebaseConfig";
+const requireAuth = (_, __, next) => {
+  const user = projectAuth.currentUser;
+  if (user) {
+    next();
+  } else {
+    // console.log("Before Enter route:", to, from, next);
+    alert("You should be logged in before entering this route!");
+    next({ name: "Login", params: {} });
+  }
+};
 
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    name: "Home",
+    meta: {
+      leading: true,
+      text: "Welcome Sky Bert",
+      isShowFooter: true,
+    },
+    component: () =>
+      import(/* webpackChunkName: "home" */ "../views/index.vue"),
   },
   {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    path: "/register",
+    name: "Register",
+    meta: {
+      layout: "auth",
+    },
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+      import(/* webpackChunkName: "about" */ "../views/register.vue"),
+  },
+  {
+    path: "/login",
+    name: "Login",
+    meta: {
+      layout: "auth",
+    },
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/login.vue"),
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    meta: {
+      text: "Profile",
+      leading: false,
+      isShowFooter: true,
+    },
+    beforeEnter: requireAuth,
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/profile.vue"),
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/logout.vue"),
+  },
+  {
+    path: "/report",
+    name: "Report",
+    meta: {
+      leading: true,
+      text: "Report",
+      isShowFooter: true,
+    },
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/report.vue"),
+  },
+  {
+    path: "/budget",
+    name: "Budget",
+    meta: {
+      leading: false,
+      text: "Budget",
+      isShowFooter: true,
+    },
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/budget.vue"),
+  },
+  {
+    path: "/new-transaction",
+    name: "NewTransaction",
+    meta: {
+      leading: true,
+      text: "New Transaction",
+      isShowFooter: false,
+    },
+    beforeEnter: requireAuth,
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/new-transaction.vue"),
   },
 ];
 
